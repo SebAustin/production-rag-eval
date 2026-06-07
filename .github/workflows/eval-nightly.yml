@@ -1,0 +1,50 @@
+name: eval-nightly
+
+on:
+  schedule:
+    - cron: "0 6 * * *"  # 06:00 UTC daily
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  full-eval:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: astral-sh/setup-uv@v4
+        with: { version: "0.5.11", python-version: "3.12.4", enable-cache: true }
+      - run: uv sync --all-extras --frozen
+      - name: Download FinanceBench
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: uv run python scripts/download_financebench.py
+      - name: Build index
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+        run: uv run python scripts/build_index.py
+      - name: Calibrate abstention
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+        run: uv run python scripts/calibrate_abstention.py
+      - name: Full eval (30 Qs)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          EVAL_COST_CAP_USD: "10.00"
+        run: uv run python -m evals.run_eval --limit 30 --seed 42
+      - name: Upload eval artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: eval-runs
+          path: evals/runs/

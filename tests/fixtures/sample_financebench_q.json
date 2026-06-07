@@ -1,0 +1,8 @@
+{
+  "question_id": "fb_001",
+  "question": "What was Apple's net sales for fiscal year 2022?",
+  "answer": "$394.3 billion",
+  "evidence": "Net sales were $394,328 million for fiscal 2022.",
+  "source_filename": "AAPL_FY2022_10K.pdf",
+  "page_number": 28
+}

@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+
+# Virtual envs
+.venv/
+venv/
+
+# uv
+.uv/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Caches
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.eval_cache.sqlite
+.contextual_cache.sqlite
+.coverage
+coverage.xml
+htmlcov/
+
+# Data artifacts (downloaded / built at runtime)
+data/financebench/*
+!data/financebench/.gitkeep
+!data/financebench/README.md
+data/calibration/*.jsonl
+data/calibration/calibrator.json
+data/index/*
+!data/index/.gitkeep
+
+# Eval run outputs (keep dir, ignore contents)
+evals/runs/*
+!evals/runs/.gitkeep
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

@@ -1,0 +1,88 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-type-test:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: astral-sh/setup-uv@v4
+        with: { version: "0.5.11", python-version: "3.12.4", enable-cache: true }
+      - run: uv sync --all-extras --frozen
+      - name: Ruff
+        run: uv run ruff check . && uv run ruff format --check .
+      - name: Mypy strict
+        run: uv run mypy --strict src/
+      - name: Pytest (mocked externals, 85% coverage)
+        env:
+          ANTHROPIC_API_KEY: test_key
+          COHERE_API_KEY: test_key
+          VOYAGE_API_KEY: test_key
+        run: |
+          uv run pytest -q -m "not eval" \
+            --cov=src/rag_eval \
+            --cov-fail-under=85 \
+            --cov-report=xml
+      - uses: codecov/codecov-action@v4
+        with: { files: coverage.xml, fail_ci_if_error: false }
+
+  eval-smoke:
+    if: github.event_name == 'pull_request'
+    needs: lint-type-test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: astral-sh/setup-uv@v4
+        with: { version: "0.5.11", python-version: "3.12.4", enable-cache: true }
+      - run: uv sync --all-extras --frozen
+      - name: Cache FinanceBench
+        uses: actions/cache@v4
+        with:
+          path: data/calibration
+          key: financebench-v1
+      - name: Download FinanceBench
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: uv run python scripts/download_financebench.py
+      - name: Eval smoke (5 Qs)
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          COHERE_API_KEY: ${{ secrets.COHERE_API_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+          EVAL_COST_CAP_USD: "1.00"
+        run: |
+          uv run python -m evals.run_eval --limit 5 --seed 42 \
+            --output-dir evals/runs/pr-${{ github.sha }}
+      - id: summary
+        if: always()
+        run: |
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          cat evals/runs/pr-${{ github.sha }}/summary.json >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+      - uses: marocchino/sticky-pull-request-comment@v2
+        if: always()
+        with:
+          header: eval-smoke
+          message: |
+            ### RAG eval smoke (5 Qs · FinanceBench)
+            ```json
+            ${{ steps.summary.outputs.body }}
+            ```
+            CI gate: faithfulness ≥ 0.85 · citation_coverage = 1.00
