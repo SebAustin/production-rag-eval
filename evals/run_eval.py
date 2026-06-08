@@ -40,10 +40,9 @@ CI_THRESHOLDS: dict[str, float] = {"ragas_faithfulness": 0.85, "citation_coverag
 
 
 def _git_sha() -> str:
+    cmd = ["git", "rev-parse", "--short", "HEAD"]
     try:
-        return subprocess.check_output(  # noqa: S603, S607
-            ["git", "rev-parse", "--short", "HEAD"],
-        ).decode().strip()
+        return subprocess.check_output(cmd).decode().strip()  # noqa: S603
     except (subprocess.CalledProcessError, FileNotFoundError):
         return "nogit"
 
@@ -51,7 +50,7 @@ def _git_sha() -> str:
 def _load_questions(limit: int, seed: int) -> list[dict[str, Any]]:
     path = Path("data/calibration/test_split.jsonl")
     rows = [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
-    random.Random(seed).shuffle(rows)
+    random.Random(seed).shuffle(rows)  # noqa: S311 — deterministic eval ordering, not crypto
     return rows[:limit] if limit else rows
 
 
@@ -68,8 +67,8 @@ async def _run_one(
     answer: CitedAnswer | None = None
     try:
         answer = await pipeline.ask(q["question"])
-    except Exception as exc:  # noqa: BLE001 — one bad question must not abort the run
-        log.error("pipeline_error", id=q["question_id"], err=str(exc))
+    except Exception:
+        log.exception("pipeline_error", id=q["question_id"])
     latency_ms = (time.perf_counter() - t0) * 1000.0
 
     contexts: list[str] = [c.cited_text for c in (answer.citations if answer else [])]
@@ -176,7 +175,7 @@ def _build_summary(results: list[EvalResult], sha: str, seed: int) -> dict[str, 
 def main(
     limit: int = typer.Option(0, "--limit"),
     seed: int = typer.Option(42, "--seed"),
-    output_dir: Path | None = typer.Option(None, "--output-dir"),
+    output_dir: Path | None = typer.Option(None, "--output-dir"),  # noqa: B008 — typer idiom
 ) -> None:
     """Run the eval, write summary.json + per_question.jsonl, gate on thresholds."""
     configure_logging()

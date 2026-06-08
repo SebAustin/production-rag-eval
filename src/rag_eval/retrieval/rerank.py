@@ -55,9 +55,9 @@ class CohereReranker:
             return []
         documents = [chunks_map[cid].contextualized_text for cid in chunk_ids]
         response = await self._rerank_with_backoff(query, documents, top_n)
-        results: list[tuple[str, float]] = []
-        for item in response.results:
-            results.append((chunk_ids[item.index], float(item.relevance_score)))
+        results: list[tuple[str, float]] = [
+            (chunk_ids[item.index], float(item.relevance_score)) for item in response.results
+        ]
         results.sort(key=lambda kv: (-kv[1], kv[0]))
         return results
 
@@ -67,7 +67,6 @@ class CohereReranker:
         documents: list[str],
         top_n: int,
     ) -> Any:  # noqa: ANN401 — SDK response type is dynamic
-        last_exc: Exception | None = None
         for attempt in range(self._max_retries + 1):
             try:
                 return await self._client.rerank(
@@ -77,11 +76,11 @@ class CohereReranker:
                     top_n=min(top_n, len(documents)),
                     return_documents=False,
                 )
-            except Exception as exc:  # noqa: BLE001 — re-raised below unless retriable
+            except Exception as exc:
                 if not _is_rate_limit(exc) or attempt == self._max_retries:
                     raise
-                last_exc = exc
                 delay = self._backoff_base_s * (2**attempt)
                 log.warning("cohere_rate_limited", attempt=attempt, delay_s=delay)
                 await asyncio.sleep(delay)
-        raise last_exc  # pragma: no cover — loop always returns or raises
+        msg = "unreachable: backoff loop always returns or raises"
+        raise AssertionError(msg)  # pragma: no cover

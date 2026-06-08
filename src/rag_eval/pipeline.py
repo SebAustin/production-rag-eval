@@ -8,10 +8,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from rag_eval.generation.citations import CitedAnswer
-
 if TYPE_CHECKING:
     from rag_eval.config import Settings
+    from rag_eval.generation.citations import CitedAnswer
 
 
 class RAGPipeline:

@@ -8,8 +8,10 @@ from __future__ import annotations
 
 import json
 import sqlite3
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 
 class SQLiteEvalCache:
@@ -25,7 +27,8 @@ class SQLiteEvalCache:
     def get(self, key: str) -> dict[str, Any] | None:
         """Return the cached payload for ``key`` or ``None``."""
         row = self._conn.execute(
-            "SELECT payload FROM results WHERE key = ?", (key,),
+            "SELECT payload FROM results WHERE key = ?",
+            (key,),
         ).fetchone()
         if row is None:
             return None

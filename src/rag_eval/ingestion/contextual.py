@@ -17,11 +17,12 @@ import sqlite3
 from pathlib import Path
 from typing import TYPE_CHECKING
 
-from rag_eval.generation.citations import Chunk
 from rag_eval.logging import get_logger
 
 if TYPE_CHECKING:
     from anthropic import AsyncAnthropic
+
+    from rag_eval.generation.citations import Chunk
 
 log = get_logger(__name__)
 
@@ -48,7 +49,8 @@ class _PrefixCache:
 
     def get(self, key: str) -> str | None:
         row = self._conn.execute(
-            "SELECT prefix FROM prefixes WHERE key = ?", (key,),
+            "SELECT prefix FROM prefixes WHERE key = ?",
+            (key,),
         ).fetchone()
         return None if row is None else str(row[0])
 

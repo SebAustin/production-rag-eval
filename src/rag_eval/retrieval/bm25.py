@@ -9,16 +9,16 @@ at index time so the term statistics line up.
 from __future__ import annotations
 
 import pickle
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
-
-from rank_bm25 import BM25Okapi
 
 from rag_eval.generation.citations import Chunk
 from rag_eval.text import tokenize
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
+    from pathlib import Path
+
+    from rank_bm25 import BM25Okapi
 
 
 class BM25Retriever:

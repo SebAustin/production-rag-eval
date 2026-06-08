@@ -15,9 +15,7 @@ def configure_logging(*, json_logs: bool = False, level: int = logging.INFO) -> 
         level: Standard-library log level threshold.
     """
     renderer: structlog.types.Processor = (
-        structlog.processors.JSONRenderer()
-        if json_logs
-        else structlog.dev.ConsoleRenderer()
+        structlog.processors.JSONRenderer() if json_logs else structlog.dev.ConsoleRenderer()
     )
     structlog.configure(
         processors=[

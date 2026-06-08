@@ -20,7 +20,7 @@ if TYPE_CHECKING:
 class DenseRetriever:
     """Embeds the query with voyage-3-large and searches the Qdrant collection."""
 
-    def __init__(
+    def __init__(  # noqa: PLR0913 — explicit retriever config; all fields meaningful
         self,
         client: QdrantClient,
         collection: str,

@@ -20,11 +20,9 @@ def load_financebench(split_path: str | Path) -> list[dict[str, Any]]:
     ``answer``, ``evidence`` (a source passage), and ``source_filename``.
     """
     path = Path(split_path)
-    rows: list[dict[str, Any]] = []
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            rows.append(json.loads(line))
-    return rows
+    return [
+        json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
+    ]
 
 
 def _evidence_text(row: dict[str, Any]) -> str:

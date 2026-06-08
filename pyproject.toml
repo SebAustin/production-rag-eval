@@ -7,16 +7,15 @@ requires-python = ">=3.12,<3.13"
 license = { text = "MIT" }
 authors = [{ name = "Sebastien Henry" }]
 dependencies = [
-  "anthropic==0.40.0",
+  "anthropic==0.42.0",
   "cohere==5.13.4",
   "voyageai==0.3.2",
   "qdrant-client==1.12.1",
   "rank-bm25==0.2.2",
   "ragas==0.2.12",
   "deepeval==2.4.1",
-  "langchain==1.0.5",
-  "langchain-anthropic==0.3.4",
-  "langchain-text-splitters==0.3.4",
+  "langchain-anthropic>=0.3.4,<0.4",
+  "langchain-text-splitters>=0.3.4,<0.4",
   "pydantic==2.9.2",
   "pydantic-settings==2.6.1",
   "fastapi==0.115.6",
@@ -58,12 +57,12 @@ src = ["src", "tests", "evals", "scripts"]
 
 [tool.ruff.lint]
 select = ["ALL"]
-ignore = ["D", "ANN101", "ANN102", "COM812", "ISC001", "FIX002", "TD002", "TD003"]
+ignore = ["D", "COM812", "ISC001", "FIX002", "TD002", "TD003"]
 
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["S101", "PLR2004", "ANN", "ARG", "SLF001"]
+"tests/**" = ["S101", "PLR2004", "ANN", "ARG", "SLF001", "TC", "I001"]
 "scripts/**" = ["T201", "INP001"]
-"evals/**" = ["T201"]
+"evals/**" = ["T201", "ARG001"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
@@ -74,6 +73,13 @@ python_version = "3.12"
 plugins = ["pydantic.mypy"]
 ignore_missing_imports = true
 warn_unreachable = true
+
+# voyageai ships no py.typed / __all__; treat it as untyped (Any) so its
+# attribute access (voyageai.Client) does not trip strict attr-defined checks.
+[[tool.mypy.overrides]]
+module = ["voyageai", "voyageai.*"]
+follow_imports = "skip"
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 asyncio_mode = "strict"

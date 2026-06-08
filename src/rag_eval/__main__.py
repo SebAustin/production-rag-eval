@@ -17,7 +17,7 @@ app = typer.Typer(add_completion=False, help="production-rag-eval CLI")
 def ask(question: str = typer.Argument(..., help="Natural-language question")) -> None:
     """Run a single question end-to-end and print the CitedAnswer as JSON."""
     configure_logging()
-    settings = Settings()  # type: ignore[call-arg]  # values come from env/.env
+    settings = Settings()  # values come from env/.env
     pipeline = RAGPipeline(settings)
     answer = asyncio.run(pipeline.ask(question))
     typer.echo(answer.model_dump_json(indent=2))

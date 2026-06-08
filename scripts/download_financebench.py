@@ -61,7 +61,7 @@ def main() -> None:
     calib, test = rows[:_CALIB_N], rows[_CALIB_N:]
     _write_jsonl(_CALIB_PATH, calib)
     _write_jsonl(_TEST_PATH, test)
-    print(  # noqa: T201
+    print(
         f"Downloaded {len(rows)} examples. "
         f"Calib: {len(calib)} -> {_CALIB_PATH}. Test: {len(test)} -> {_TEST_PATH}.",
     )
