@@ -8,11 +8,13 @@ original ``text`` and char offsets so generation/citations can recover spans.
 from __future__ import annotations
 
 import pickle
+import time
 import uuid
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import voyageai
+import voyageai.error
 from qdrant_client import QdrantClient, models
 from rank_bm25 import BM25Okapi
 
@@ -26,7 +28,11 @@ if TYPE_CHECKING:
 log = get_logger(__name__)
 
 _QDRANT_NAMESPACE = uuid.UUID("00000000-0000-0000-0000-00000000f1ce")
-_EMBED_BATCH = 128
+# Batch sized to stay under Voyage's free-tier 10K tokens/min cap; larger is
+# fine on paid tiers but harmless here.
+_EMBED_BATCH = 32
+_EMBED_MAX_RETRIES = 6
+_EMBED_BACKOFF_BASE_S = 15.0  # free tier is 3 RPM -> ~20s between requests
 _BM25_PATH = Path("data/index/bm25.pkl")
 _CHUNKS_PATH = Path("data/index/chunks.jsonl")
 
@@ -92,13 +98,24 @@ class HybridIndexer:
         log.info("dense_indexed", points=len(points), collection=collection)
 
     def _embed_documents(self, texts: list[str]) -> list[list[float]]:
-        result = self._voyage.embed(
-            texts,
-            model=self._settings.voyage_model,
-            input_type="document",
-            output_dimension=self._settings.embedding_dim,
-        )
-        return [list(map(float, v)) for v in result.embeddings]
+        for attempt in range(_EMBED_MAX_RETRIES + 1):
+            try:
+                result = self._voyage.embed(
+                    texts,
+                    model=self._settings.voyage_model,
+                    input_type="document",
+                    output_dimension=self._settings.embedding_dim,
+                )
+            except voyageai.error.RateLimitError:
+                if attempt == _EMBED_MAX_RETRIES:
+                    raise
+                delay = _EMBED_BACKOFF_BASE_S * (attempt + 1)
+                log.warning("voyage_rate_limited", attempt=attempt, delay_s=delay)
+                time.sleep(delay)
+            else:
+                return [list(map(float, v)) for v in result.embeddings]
+        msg = "unreachable: embed retry loop always returns or raises"
+        raise AssertionError(msg)  # pragma: no cover
 
     def _build_bm25(self, chunks: list[Chunk]) -> None:
         corpus = [tokenize(c.contextualized_text) for c in chunks]
