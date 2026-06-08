@@ -16,9 +16,14 @@ All notable changes to this project are documented here. Format follows
   - `ContextualRetriever` — Anthropic Contextual Retrieval prefix via Claude
     Haiku, with SQLite caching and bounded-concurrency batch processing.
   - `HybridIndexer` — voyage-3-large dense vectors into Qdrant + BM25 pickle.
-- Skeletons (impl in later prompts): retrieval (BM25/dense/RRF/rerank),
-  abstention (scorer/calibration/predictor), generation (answer/pipeline),
-  FastAPI server, eval harness.
+- Retrieval cascade (P3):
+  - `BM25Retriever` — loads the pickled BM25Okapi index; top-k by score.
+  - `DenseRetriever` — voyage-3-large query embedding + Qdrant search, returning
+    chunk ids (off-loop via `asyncio.to_thread`).
+  - `rrf_fuse` — Reciprocal Rank Fusion (k=60), pure function.
+  - `CohereReranker` — `rerank-v3.5` with exponential backoff on HTTP 429.
+- Skeletons (impl in later prompts): abstention (calibration/predictor),
+  generation (answer/pipeline), FastAPI `/ask`, eval LLM judges.
 
 ## [0.1.0] — TBD (target Fri Jun 13, 2026)
 
