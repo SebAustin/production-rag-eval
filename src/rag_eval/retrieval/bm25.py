@@ -28,6 +28,11 @@ class BM25Retriever:
         self._bm25 = bm25
         self._chunks = list(chunks)
 
+    @property
+    def chunks(self) -> list[Chunk]:
+        """The ordered chunk list this index was built from."""
+        return self._chunks
+
     @classmethod
     def load(cls, path: Path) -> BM25Retriever:
         """Load a BM25 index + chunk list from the pickle written at index time."""

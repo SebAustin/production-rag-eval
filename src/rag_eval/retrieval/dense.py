@@ -13,6 +13,8 @@ from typing import TYPE_CHECKING
 
 import voyageai
 
+from rag_eval.embedding import embed_with_backoff
+
 if TYPE_CHECKING:
     from qdrant_client import QdrantClient
 
@@ -54,10 +56,11 @@ class DenseRetriever:
         return results
 
     def _embed_query(self, query: str) -> list[float]:
-        result = self._voyage.embed(
+        vectors = embed_with_backoff(
+            self._voyage,
             [query],
             model=self._voyage_model,
             input_type="query",
             output_dimension=self._embedding_dim,
         )
-        return [float(x) for x in result.embeddings[0]]
+        return vectors[0]
