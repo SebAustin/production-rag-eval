@@ -38,12 +38,20 @@ flowchart LR
 
 ```bash
 git clone https://github.com/SebAustin/production-rag-eval && cd production-rag-eval
-uv sync && cp .env.example .env   # then fill in API keys
-make download-data    # pulls FinanceBench from HuggingFace (~10 min)
-make build-index      # contextualizes + embeds + indexes (~30 min, ~$0.80)
+uv sync && cp .env.example .env       # then put REAL keys in .env (Anthropic/Cohere/Voyage)
+
+# Qdrant must be running for build-index / calibrate / ask / eval:
+docker run -d --name rag-eval-qdrant -p 6333:6333 \
+  -v "$(pwd)/data/index/qdrant_storage:/qdrant/storage" qdrant/qdrant
+
+make download-data    # pulls FinanceBench from HuggingFace (~1 min)
+make build-index      # contextualizes (~550 Haiku calls) + embeds + indexes (~$1)
 make calibrate        # fits conformal threshold on 120-Q calibration split
 make ask Q="What was Apple's revenue in fiscal year 2022?"
 ```
+
+> **Model IDs** are pinned in `.env` (`HAIKU_MODEL`, `SONNET_MODEL`) — set them to
+> IDs your Anthropic account actually exposes (list via the `/v1/models` endpoint).
 
 ## Eval results (FinanceBench test split n=30, seed=42)
 

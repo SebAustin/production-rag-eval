@@ -45,8 +45,8 @@ class Settings(BaseSettings):
     conformal_alpha: float = 0.10
 
     # --- Models ---
-    haiku_model: str = "claude-haiku-4-5-20250929"
-    sonnet_model: str = "claude-sonnet-4-5-20251022"
+    haiku_model: str = "claude-haiku-4-5-20251001"
+    sonnet_model: str = "claude-sonnet-4-5-20250929"
 
     # --- Cost guardrails ---
     max_api_spend_usd: float = 10.0

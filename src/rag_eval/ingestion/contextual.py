@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 log = get_logger(__name__)
 
-_DEFAULT_HAIKU = "claude-haiku-4-5-20250929"
+_DEFAULT_HAIKU = "claude-haiku-4-5-20251001"
 _MAX_DOC_CHARS = 8000
 _SYSTEM_PROMPT = "You are a document context summarizer. Respond in 1-2 sentences only."
 _DEFAULT_CACHE_PATH = Path(".contextual_cache.sqlite")
