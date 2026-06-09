@@ -1,4 +1,9 @@
-"""Build the hybrid index from the FinanceBench calibration split.
+"""Build the hybrid index over the WHOLE FinanceBench corpus.
+
+The index must contain every question's evidence (calibration AND test splits):
+the split only decides which questions calibrate the conformal threshold vs. get
+evaluated — not what is retrievable. Indexing only the calibration split makes
+every test question abstain, since its source passages aren't present.
 
 Pipeline: load rows -> evidence passages to chunks -> Contextual Retrieval
 prefixes (Claude Haiku, cached) -> embed + index (Qdrant dense + BM25 pickle).
@@ -19,7 +24,10 @@ from rag_eval.logging import configure_logging, get_logger
 
 log = get_logger(__name__)
 
-_CALIB_PATH = Path("data/calibration/calib_split.jsonl")
+_SPLIT_PATHS = (
+    Path("data/calibration/calib_split.jsonl"),
+    Path("data/calibration/test_split.jsonl"),
+)
 
 
 def _documents_by_source(rows: list[dict[str, object]]) -> dict[str, str]:
@@ -36,7 +44,7 @@ async def _run() -> None:
     configure_logging()
     settings = Settings()  # type: ignore[call-arg]  # values from env/.env
 
-    rows = load_financebench(_CALIB_PATH)
+    rows = [row for path in _SPLIT_PATHS for row in load_financebench(path)]
     chunks = load_passages(rows)
     docs = _documents_by_source(rows)
     log.info("loaded", rows=len(rows), chunks=len(chunks), docs=len(docs))
