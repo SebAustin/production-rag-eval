@@ -65,9 +65,11 @@ async def _run_one(
 
     t0 = time.perf_counter()
     answer: CitedAnswer | None = None
+    errored = False
     try:
         answer = await pipeline.ask(q["question"])
     except Exception:
+        errored = True
         log.exception("pipeline_error", id=q["question_id"])
     latency_ms = (time.perf_counter() - t0) * 1000.0
 
@@ -115,7 +117,9 @@ async def _run_one(
         latency_ms=latency_ms,
         cost_usd=answer.cost_usd if answer else 0.0,
     )
-    cache.put(cache_key, result.model_dump(mode="json"))
+    # Don't cache pipeline errors — a transient failure must be retried, not pinned.
+    if not errored:
+        cache.put(cache_key, result.model_dump(mode="json"))
     return result
 
 
@@ -171,6 +175,32 @@ def _build_summary(results: list[EvalResult], sha: str, seed: int) -> dict[str, 
     }
 
 
+async def _collect(
+    settings: Settings,
+    questions: list[dict[str, Any]],
+    cache: SQLiteEvalCache,
+) -> list[EvalResult]:
+    """Run every question on one event loop so async clients stay bound to it."""
+    pipeline = RAGPipeline.from_settings(settings)
+    results: list[EvalResult] = []
+    total_cost = 0.0
+    for q in questions:
+        if total_cost >= COST_CAP:
+            log.warning("cost_cap_hit", cap=COST_CAP, spent=total_cost)
+            break
+        result = await _run_one(pipeline, q, cache)
+        results.append(result)
+        total_cost += result.cost_usd
+        log.info(
+            "done",
+            id=result.question_id,
+            abstained=result.abstained,
+            faithfulness=result.ragas_faithfulness,
+            cite_cov=result.citation_coverage,
+        )
+    return results
+
+
 @app.command()
 def main(
     limit: int = typer.Option(0, "--limit"),
@@ -184,26 +214,9 @@ def main(
     out.mkdir(parents=True, exist_ok=True)
 
     settings = Settings()  # type: ignore[call-arg]  # values from env/.env
-    pipeline = RAGPipeline.from_settings(settings)
     cache = SQLiteEvalCache(Path(".eval_cache.sqlite"))
-
     questions = _load_questions(limit, seed)
-    results: list[EvalResult] = []
-    total_cost = 0.0
-    for q in questions:
-        if total_cost >= COST_CAP:
-            log.warning("cost_cap_hit", cap=COST_CAP, spent=total_cost)
-            break
-        result = asyncio.run(_run_one(pipeline, q, cache))
-        results.append(result)
-        total_cost += result.cost_usd
-        log.info(
-            "done",
-            id=result.question_id,
-            abstained=result.abstained,
-            faithfulness=result.ragas_faithfulness,
-            cite_cov=result.citation_coverage,
-        )
+    results = asyncio.run(_collect(settings, questions, cache))
 
     summary = _build_summary(results, sha, seed)
     (out / "summary.json").write_text(json.dumps(summary, indent=2))

@@ -14,18 +14,20 @@ def configure_logging(*, json_logs: bool = False, level: int = logging.INFO) -> 
         json_logs: Emit JSON lines (for prod/CI) instead of the console renderer.
         level: Standard-library log level threshold.
     """
-    renderer: structlog.types.Processor = (
-        structlog.processors.JSONRenderer() if json_logs else structlog.dev.ConsoleRenderer()
-    )
+    processors: list[structlog.types.Processor] = [
+        structlog.contextvars.merge_contextvars,
+        structlog.processors.add_log_level,
+        structlog.processors.TimeStamper(fmt="iso"),
+        structlog.processors.StackInfoRenderer(),
+    ]
+    if json_logs:
+        # JSONRenderer needs exc_info serialized; ConsoleRenderer formats it itself.
+        processors.append(structlog.processors.format_exc_info)
+        processors.append(structlog.processors.JSONRenderer())
+    else:
+        processors.append(structlog.dev.ConsoleRenderer())
     structlog.configure(
-        processors=[
-            structlog.contextvars.merge_contextvars,
-            structlog.processors.add_log_level,
-            structlog.processors.TimeStamper(fmt="iso"),
-            structlog.processors.StackInfoRenderer(),
-            structlog.processors.format_exc_info,
-            renderer,
-        ],
+        processors=processors,
         wrapper_class=structlog.make_filtering_bound_logger(level),
         cache_logger_on_first_use=True,
     )
