@@ -29,8 +29,16 @@ All notable changes to this project are documented here. Format follows
   (bm25 → dense → rrf → rerank → conformal → answer/abstain), DI-friendly with
   `RAGPipeline.from_settings`. `make ask` is now functional.
 - Bumped `anthropic` 0.42.0 → 0.49.0: the Citations API is absent below 0.43.
-- Skeletons (impl in later prompts): eval LLM judges (RAGAS/HHEM/DeepEval),
-  ablation script, FastAPI `/ask` wiring.
+- Triple eval scorers (P6), replacing the `pending` placeholders:
+  - RAGAS faithfulness / answer-relevancy / context-precision via a Claude
+    Sonnet judge (`LangchainLLMWrapper`) + a voyage-3-large embeddings adapter.
+  - Vectara HHEM-2.1-Open via a local transformers CrossEncoder (returns
+    `None`/pending when the ~1.3GB model isn't available).
+  - DeepEval G-Eval (financial rubric) judged by Claude (`ClaudeDeepEval`
+    adapter, since DeepEval ships only GPT models).
+  - All three degrade gracefully to pending on failure; unit tests mock the
+    heavy calls, and a live smoke test is marked `eval` (deselected in CI).
+- Skeletons (impl in later prompts): ablation script (P7), FastAPI `/ask` wiring.
 
 ## [0.1.0] — TBD (target Fri Jun 13, 2026)
 

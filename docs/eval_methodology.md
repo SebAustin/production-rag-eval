@@ -1,9 +1,10 @@
 # Eval Methodology
 
-> Status: harness scaffolded (Prompt 1). Citation + abstention metrics are
-> implemented; RAGAS / HHEM / DeepEval judges land in Prompt 6. Until then the
-> harness records those metrics as `pending` rather than fabricating numbers
-> (eval-honesty contract, `.cursorrules`).
+> Status: all scorers implemented. RAGAS (Claude Sonnet judge + voyage
+> embeddings), Vectara HHEM (local CrossEncoder), and DeepEval G-Eval (Claude)
+> each degrade to `pending` (`{}` / `None`) on failure rather than crashing or
+> fabricating numbers (eval-honesty contract, `.cursorrules`). Run live numbers
+> with `make eval-smoke` (5 Qs) or `make eval` (30 Qs).
 
 ## Dataset split
 
