@@ -13,6 +13,11 @@ from rag_eval.pipeline import RAGPipeline
 app = typer.Typer(add_completion=False, help="production-rag-eval CLI")
 
 
+@app.callback()
+def _root() -> None:
+    """production-rag-eval CLI. Keeps subcommands explicit (e.g. ``ask``)."""
+
+
 @app.command()
 def ask(question: str = typer.Argument(..., help="Natural-language question")) -> None:
     """Run a single question end-to-end and print the CitedAnswer as JSON."""
