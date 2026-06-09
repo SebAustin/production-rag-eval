@@ -22,8 +22,15 @@ All notable changes to this project are documented here. Format follows
     chunk ids (off-loop via `asyncio.to_thread`).
   - `rrf_fuse` — Reciprocal Rank Fusion (k=60), pure function.
   - `CohereReranker` — `rerank-v3.5` with exponential backoff on HTTP 429.
-- Skeletons (impl in later prompts): abstention (calibration/predictor),
-  generation (answer/pipeline), FastAPI `/ask`, eval LLM judges.
+- Conformal abstention (P4): `ConformalCalibrator` (fit/save/load),
+  `ConformalPredictor`, and `scripts/calibrate_abstention.py`.
+- Generation (P5): `RAGAnswerGenerator` (Anthropic Citations API, ≥2-citation
+  contract, Sonnet cost accounting) and `RAGPipeline.ask` orchestration
+  (bm25 → dense → rrf → rerank → conformal → answer/abstain), DI-friendly with
+  `RAGPipeline.from_settings`. `make ask` is now functional.
+- Bumped `anthropic` 0.42.0 → 0.49.0: the Citations API is absent below 0.43.
+- Skeletons (impl in later prompts): eval LLM judges (RAGAS/HHEM/DeepEval),
+  ablation script, FastAPI `/ask` wiring.
 
 ## [0.1.0] — TBD (target Fri Jun 13, 2026)
 

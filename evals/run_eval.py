@@ -184,7 +184,7 @@ def main(
     out.mkdir(parents=True, exist_ok=True)
 
     settings = Settings()  # type: ignore[call-arg]  # values from env/.env
-    pipeline = RAGPipeline(settings)
+    pipeline = RAGPipeline.from_settings(settings)
     cache = SQLiteEvalCache(Path(".eval_cache.sqlite"))
 
     questions = _load_questions(limit, seed)

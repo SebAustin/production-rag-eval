@@ -18,7 +18,7 @@ def ask(question: str = typer.Argument(..., help="Natural-language question")) -
     """Run a single question end-to-end and print the CitedAnswer as JSON."""
     configure_logging()
     settings = Settings()  # values come from env/.env
-    pipeline = RAGPipeline(settings)
+    pipeline = RAGPipeline.from_settings(settings)
     answer = asyncio.run(pipeline.ask(question))
     typer.echo(answer.model_dump_json(indent=2))
 
