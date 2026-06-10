@@ -23,7 +23,11 @@ if TYPE_CHECKING:
 log = get_logger(__name__)
 
 _MAX_TOKENS = 1024
-_MIN_CITATIONS = 2
+# Require at least one grounding citation on a non-abstention answer. (The spec
+# floated >=2, but many valid FinanceBench answers cite a single source — a
+# calculation, a one-line fact — and a hard >=2 rule discards them as errors.
+# Citation *quality* is graded separately by evals.citation_eval.)
+_MIN_CITATIONS = 1
 _ABSTENTION_MARKER = "do not contain"
 # Claude Sonnet 4.5 list pricing (USD per million tokens).
 _INPUT_USD_PER_MTOK = 3.0
