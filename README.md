@@ -29,7 +29,7 @@ flowchart LR
     B & D --> RRF[RRF fuse k=60]
     RRF --> RR[Cohere Rerank 3.5 top-10]
     RR --> CA[Conformal Abstention<br/>tau calibrated on 120 Qs alpha=0.10]
-    CA -->|answer| GEN[Claude Sonnet 4.5<br/>Citations API CitedAnswer]
+    CA -->|answer| GEN[Claude Sonnet 4.6<br/>Citations API CitedAnswer]
     CA -->|abstain| ABS[abstained: true<br/>insufficient_retrieval_confidence]
     GEN --> EVAL[RAGAS faithfulness<br/>Vectara HHEM<br/>DeepEval G-Eval<br/>Citation coverage]
 ```

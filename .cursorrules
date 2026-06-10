@@ -6,7 +6,7 @@ You are pairing with a senior AI engineer. Write production code. No tutorials.
 
 ## Stack (pinned Jun 2026)
 - Python 3.12.4. uv 0.5.x. ruff 0.8.4. mypy 1.13 --strict. pydantic 2.9.
-- anthropic==0.40.0. Claude Sonnet 4.5 for generation, Haiku for contextualization.
+- anthropic==0.40.0. Claude Sonnet 4.6 for generation, Haiku for contextualization.
 - cohere==5.13.4 (rerank-v3.5 only — no Cohere generation).
 - voyageai==0.3.2 (voyage-3-large, output_dimension=256, Matryoshka).
 - qdrant-client==1.12.1 for dense vector storage.

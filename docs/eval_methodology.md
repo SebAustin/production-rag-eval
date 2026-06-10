@@ -16,7 +16,7 @@ runner shuffles the test split with a fixed `--seed 42` for reporting order only
 
 | Metric | Source | Notes |
 |---|---|---|
-| RAGAS faithfulness | RAGAS 0.2.x, Claude Sonnet 4.5 judge (temp 0) | CI gate ≥ 0.85 |
+| RAGAS faithfulness | RAGAS 0.2.x, Claude Sonnet 4.6 judge (temp 0) | CI gate ≥ 0.85 |
 | RAGAS answer relevancy | RAGAS | |
 | RAGAS context precision | RAGAS | |
 | Vectara HHEM | `vectara/hallucination_evaluation_model` CrossEncoder | local ~1.3GB; `pending` if absent |
@@ -25,7 +25,7 @@ runner shuffles the test split with a fixed `--seed 42` for reporting order only
 | Abstention rate | local | n_abstained / n_total |
 | Conformal coverage | local (`evals/abstention_eval.py`) | empirical vs 1 − α |
 
-### Why Claude Sonnet 4.5 as the RAGAS judge
+### Why Claude Sonnet 4.6 as the RAGAS judge
 Consistency with the generation model family and strong instruction-following on
 financial text; temperature 0 for reproducibility. The judge is a configurable
 wrapper, so swapping it is a one-line change.

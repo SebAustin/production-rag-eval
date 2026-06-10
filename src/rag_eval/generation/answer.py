@@ -3,7 +3,7 @@
 Each reranked chunk is passed as a Citations API document using its *original*
 ``text`` (not the contextualized text) so citation char offsets land on real
 source spans. The model is instructed to answer only from the passages and cite
-every claim; a non-abstention answer with fewer than two citations violates the
+every claim; a non-abstention answer with no grounding citation violates the
 citation contract.
 """
 
@@ -29,7 +29,7 @@ _MAX_TOKENS = 1024
 # Citation *quality* is graded separately by evals.citation_eval.)
 _MIN_CITATIONS = 1
 _ABSTENTION_MARKER = "do not contain"
-# Claude Sonnet 4.5 list pricing (USD per million tokens).
+# Claude Sonnet 4.6 list pricing (USD per million tokens).
 _INPUT_USD_PER_MTOK = 3.0
 _OUTPUT_USD_PER_MTOK = 15.0
 
@@ -56,7 +56,7 @@ class RAGAnswerGenerator:
         chunks_map: dict[str, Chunk],
         nonconformity_score: float,
     ) -> CitedAnswer:
-        """Generate a cited answer. Raises CitationContractError if < 2 citations."""
+        """Generate a cited answer. Raises CitationContractError if uncited."""
         documents = [
             self._document_block(chunks_map[chunk_id]) for chunk_id, _score in reranked_chunks
         ]

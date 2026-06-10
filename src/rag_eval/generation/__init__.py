@@ -1,4 +1,4 @@
-"""Generation: Claude Sonnet 4.5 + Anthropic Citations API."""
+"""Generation: Claude Sonnet 4.6 + Anthropic Citations API."""
 
 from __future__ import annotations
 

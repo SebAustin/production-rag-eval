@@ -1,6 +1,6 @@
 """RAGAS faithfulness / answer-relevancy / context-precision.
 
-Judge LLM: Claude Sonnet 4.5 (temperature 0) via ``LangchainLLMWrapper``.
+Judge LLM: Claude Sonnet 4.6 (temperature 0) via ``LangchainLLMWrapper``.
 Answer-relevancy embeddings: voyage-3-large via :class:`VoyageEmbeddings`.
 
 On any failure the scorer returns ``{}`` so the harness records the metrics as

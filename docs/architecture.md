@@ -38,8 +38,8 @@ query --> bm25_retrieve ┐              |
   [conformal_abstention.md](conformal_abstention.md).
 
 ### Generation (`src/rag_eval/generation/`) — *Prompt 5*
-- Claude Sonnet 4.5 + Anthropic Citations API; original chunk text is the
-  citation source. ≥2 citations enforced (`CitationContractError`).
+- Claude Sonnet 4.6 + Anthropic Citations API; original chunk text is the
+  citation source. ≥1 grounding citation enforced (`CitationContractError`).
 
 ### Eval (`evals/`) — *Prompt 6*
 - RAGAS, Vectara HHEM, DeepEval G-Eval, citation coverage, conformal coverage.
