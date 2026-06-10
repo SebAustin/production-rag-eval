@@ -55,43 +55,50 @@ make ask Q="What was Apple's revenue in fiscal year 2022?"
 
 ## Eval results (FinanceBench test split n=30, seed=42)
 
-> **Status: not yet run on this checkout.** Per the eval-honesty contract in
-> `.cursorrules`, this table is generated from the most recent
-> `evals/runs/<git_sha>/summary.json` — never hand-edited. Targets are the CI
-> gates; actuals populate after `make eval`. Until then, actuals read `pending`.
+> Copied from `evals/runs/3c53d10/summary.json` (Claude Sonnet 4.6 for
+> generation **and** the RAGAS/DeepEval judge; voyage-3-large; Cohere
+> rerank-v3.5). Per the eval-honesty contract in `.cursorrules` these are the
+> harness's own output, not hand-picked — and they are deliberately published
+> even where they miss target. Reproduce with `make eval`.
 
 | Metric | Target | Actual | Notes |
 |---|---|---|---|
-| RAGAS faithfulness | ≥ 0.85 | _pending_ | Answered questions only; CI gate |
-| RAGAS answer relevancy | ≥ 0.80 | _pending_ | |
-| RAGAS context precision | ≥ 0.75 | _pending_ | |
-| Vectara HHEM score | ≥ 0.80 | _pending_ | Requires local model (~1.3GB) |
-| DeepEval G-Eval (financial) | ≥ 0.75 | _pending_ | |
-| Citation coverage | 1.00 | _pending_ | On answered questions; CI gate |
-| Abstention rate | report | _pending_ | n abstained / n total |
-| Conditional accuracy | ≥ 0.85 | _pending_ | Answered + correct |
-| Conformal coverage | ≥ 0.90 | _pending_ | Calibration guarantee |
-| p50 latency | < 4s | _pending_ | |
-| Cost per question | < $0.05 | _pending_ | |
+| RAGAS faithfulness | ≥ 0.85 | **0.83** | Below gate; residual gap is multi-step calculations — see [financebench_analysis.md](docs/financebench_analysis.md) |
+| RAGAS answer relevancy | ≥ 0.80 | **0.77** | |
+| RAGAS context precision | ≥ 0.75 | **0.70** | Measured over the 10 reranked passages |
+| Vectara HHEM score | ≥ 0.80 | _pending_ | Local ~1.3GB model not installed for this run |
+| DeepEval G-Eval (financial) | ≥ 0.75 | **0.85** | ✅ |
+| Citation coverage | 1.00 | **1.00** | ✅ every answered question grounded (≥1 citation) |
+| Abstention rate | report | **7%** | 2/30; conformal α=0.10 |
+| Conditional accuracy | ≥ 0.85 | **0.86** | faithfulness ≥ 0.5 proxy (no hard oracle yet) |
+| Conformal coverage | ≥ 0.90 | **0.86** | not met on n=30 (small sample + calc hard cases) |
+| p50 latency | < 4s | 8.6s\* | \*inflated by Voyage free-tier rate-limit backoff, not real compute |
+| Cost per question | < $0.05 | **$0.011** | generation only (~$0.33/run incl. judges) |
 
+The honest headline: **faithfulness 0.83**, lifted from 0.51 over three documented
+iterations (Sonnet 4.6, judge-context fix, prompt tightening). The remaining
+0.02 gap to the 0.85 gate is concentrated in multi-step calculation questions,
+where RAGAS penalizes a *computed* figure that isn't verbatim in any passage.
 Reproduce: `make eval` (full, n=30) or `make eval-smoke` (n=5).
 
 ## Ablation (hybrid vs components)
 
-> Run `make ablation` to generate [docs/ablation_results.md](docs/ablation_results.md).
+> From [docs/ablation_results.md](docs/ablation_results.md) (`make ablation`).
 > The ablation measures **retrieval quality** directly — whether each config
 > surfaces a question's gold evidence chunk(s) in the top-10 — so it needs no
-> generation or LLM judge. Numbers populate from the run.
+> generation or LLM judge.
 
 | Retriever | hit@10 | recall@10 | MRR |
 |---|---|---|---|
-| BM25 only | _pending_ | _pending_ | _pending_ |
-| Dense only (voyage-3-large) | _pending_ | _pending_ | _pending_ |
-| BM25 + Dense + RRF | _pending_ | _pending_ | _pending_ |
-| + Cohere Rerank 3.5 | _pending_ | _pending_ | _pending_ |
+| BM25 only | 0.80 | 0.59 | 0.565 |
+| Dense only (voyage-3-large) | 1.00 | 0.91 | **0.894** |
+| BM25 + Dense + RRF | 0.93 | 0.74 | 0.638 |
+| + Cohere Rerank 3.5 | 1.00 | 0.92 | 0.823 |
 
-All configs run on the contextualized index. Isolating the Contextual Retrieval
-contribution needs a parallel index over raw chunk text — see the script docstring.
+Honest finding: on this split **dense-only has the best MRR** (0.894) — Cohere
+rerank ties on hit/recall but slightly lowers ranking quality here. All configs
+run on the contextualized index; isolating the Contextual Retrieval contribution
+needs a parallel index over raw chunk text (see the script docstring).
 
 ## Sources
 

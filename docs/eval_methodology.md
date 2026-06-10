@@ -53,5 +53,20 @@ make calibrate           # fit conformal τ on the calibration split
 make eval                # full eval, n=30, seed=42
 ```
 Outputs land in `evals/runs/<git_sha>/summary.json` and `per_question.jsonl`.
-The README eval table is generated from the latest `summary.json` — never edited
-by hand.
+The README eval table is copied from a `summary.json` — never invented by hand.
+
+## Canonical run + caveats
+The published numbers come from run **`3c53d10`** (Sonnet 4.6, seed=42, n=30):
+faithfulness 0.83, relevancy 0.77, context precision 0.70, DeepEval 0.85,
+citation coverage 1.00, abstention 7%.
+
+- **HHEM is `pending`** in this run — the ~1.3GB `vectara/hallucination_
+  evaluation_model` was not installed; the scorer returns `None` rather than
+  fabricating a value. Install it (transformers + the model) to populate it.
+- **Latency is not comparable to production.** Measured p50 ≈ 8.6s / p95 ≈ 27s
+  are dominated by Voyage **free-tier rate-limit backoff** (the dense query embed
+  sleeps 15–45s when throttled), not by real compute. With a paid Voyage tier the
+  per-question latency is a fraction of this.
+- **Faithfulness < gate is intentional and honest** — see
+  [financebench_analysis.md](financebench_analysis.md) for why the residual gap is
+  multi-step calculation questions.

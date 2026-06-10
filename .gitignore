@@ -45,3 +45,7 @@ evals/runs/*
 .DS_Store
 .idea/
 .vscode/
+
+# DeepEval telemetry / stray logs
+.deepeval_telemetry.txt
+log.txt
