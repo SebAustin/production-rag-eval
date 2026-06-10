@@ -38,7 +38,11 @@ All notable changes to this project are documented here. Format follows
     adapter, since DeepEval ships only GPT models).
   - All three degrade gracefully to pending on failure; unit tests mock the
     heavy calls, and a live smoke test is marked `eval` (deselected in CI).
-- Skeletons (impl in later prompts): ablation script (P7), FastAPI `/ask` wiring.
+- Retriever ablation (P7): `scripts/run_ablation.py` compares bm25-only /
+  dense-only / RRF / RRF+rerank by gold-evidence retrieval quality (hit@10 /
+  recall@10 / MRR) — no generation or LLM judge needed. Reusable metric helpers
+  in `rag_eval.retrieval.metrics` (unit-tested). Writes `docs/ablation_results.md`.
+- Remaining: FastAPI `/ask` wiring to the pipeline (CLI path is live).
 
 ## [0.1.0] — TBD (target Fri Jun 13, 2026)
 

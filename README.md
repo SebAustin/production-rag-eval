@@ -78,16 +78,20 @@ Reproduce: `make eval` (full, n=30) or `make eval-smoke` (n=5).
 
 ## Ablation (hybrid vs components)
 
-> Run `make ablation` to generate `docs/ablation_results.md`. The table below is
-> the set of configurations measured; numbers populate from the ablation run.
+> Run `make ablation` to generate [docs/ablation_results.md](docs/ablation_results.md).
+> The ablation measures **retrieval quality** directly — whether each config
+> surfaces a question's gold evidence chunk(s) in the top-10 — so it needs no
+> generation or LLM judge. Numbers populate from the run.
 
-| Retriever | RAGAS faithfulness | Context recall |
-|---|---|---|
-| BM25 only | _pending_ | _pending_ |
-| Dense only | _pending_ | _pending_ |
-| BM25 + Dense + RRF | _pending_ | _pending_ |
-| + Cohere Rerank | _pending_ | _pending_ |
-| + Contextual Retrieval | _pending_ | _pending_ |
+| Retriever | hit@10 | recall@10 | MRR |
+|---|---|---|---|
+| BM25 only | _pending_ | _pending_ | _pending_ |
+| Dense only (voyage-3-large) | _pending_ | _pending_ | _pending_ |
+| BM25 + Dense + RRF | _pending_ | _pending_ | _pending_ |
+| + Cohere Rerank 3.5 | _pending_ | _pending_ | _pending_ |
+
+All configs run on the contextualized index. Isolating the Contextual Retrieval
+contribution needs a parallel index over raw chunk text — see the script docstring.
 
 ## Sources
 
