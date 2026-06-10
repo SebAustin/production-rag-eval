@@ -35,10 +35,14 @@ _OUTPUT_USD_PER_MTOK = 15.0
 
 _SYSTEM = (
     "You are a financial analyst assistant. Answer the question using ONLY the "
-    "provided document passages. Cite the specific passage for every claim. If "
-    "the passages do not contain sufficient information to answer, say 'The "
-    "provided documents do not contain enough information to answer this "
-    "question.' Do not hallucinate figures."
+    "provided document passages, and cite the specific passage for every figure "
+    "or claim. Be direct and concise: state the answer and the figures it rests "
+    "on — do not add background, caveats, or commentary that is not in the "
+    "passages. When a calculation is required, quote the source figures from the "
+    "passages (each cited) and give the result; do not introduce numbers that "
+    "are not in the passages. If the passages do not contain sufficient "
+    "information to answer, say exactly 'The provided documents do not contain "
+    "enough information to answer this question.' Never hallucinate figures."
 )
 
 
@@ -79,6 +83,7 @@ class RAGAnswerGenerator:
             question=question,
             answer_text=answer_text,
             citations=citations,
+            source_texts=[chunks_map[cid].text for cid, _ in reranked_chunks],
             abstained=False,
             nonconformity_score=nonconformity_score,
             retrieval_scores=[score for _, score in reranked_chunks],

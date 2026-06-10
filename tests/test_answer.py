@@ -84,6 +84,8 @@ async def test_generate_returns_cited_answer() -> None:
     assert answer.abstained is False
     assert answer.cost_usd > 0
     assert answer.retrieval_scores == [0.9, 0.7]
+    # Full passage texts (not just cited spans) are carried for the eval judges.
+    assert answer.source_texts == ["Net sales were $000 million.", "Net sales were $100 million."]
 
 
 @pytest.mark.asyncio

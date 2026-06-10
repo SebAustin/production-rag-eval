@@ -73,7 +73,11 @@ async def _run_one(
         log.exception("pipeline_error", id=q["question_id"])
     latency_ms = (time.perf_counter() - t0) * 1000.0
 
-    contexts: list[str] = [c.cited_text for c in (answer.citations if answer else [])]
+    # Score judges against the full passages the generator saw (its retrieval
+    # context), not just the cited spans; fall back to cited text if unset.
+    contexts: list[str] = []
+    if answer:
+        contexts = answer.source_texts or [c.cited_text for c in answer.citations]
     scoreable = bool(answer) and not (answer.abstained if answer else True)
 
     ragas_scores = (

@@ -43,6 +43,9 @@ class CitedAnswer(BaseModel):
     question: str
     answer_text: str
     citations: list[CitedSpan] = Field(default_factory=list)
+    # Full text of every passage given to the generator — the retrieval context
+    # against which eval judges (RAGAS faithfulness, HHEM, DeepEval) score claims.
+    source_texts: list[str] = Field(default_factory=list)
     abstained: bool = False
     abstention_reason: str | None = None
     nonconformity_score: float = 0.0
