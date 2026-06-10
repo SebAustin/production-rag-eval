@@ -29,8 +29,9 @@ def test_coverage_full_with_two_citations() -> None:
     assert citation_coverage(_answer(2)) == 1.0
 
 
-def test_coverage_half_with_one_citation() -> None:
-    assert citation_coverage(_answer(1)) == 0.5
+def test_coverage_full_with_one_citation() -> None:
+    # >=1 grounding citation satisfies the contract.
+    assert citation_coverage(_answer(1)) == 1.0
 
 
 def test_coverage_zero_with_no_citations() -> None:
@@ -39,6 +40,16 @@ def test_coverage_zero_with_no_citations() -> None:
 
 def test_abstention_scores_full_coverage() -> None:
     assert citation_coverage(_answer(0, abstained=True)) == 1.0
+
+
+def test_insufficient_info_answer_scores_full_coverage() -> None:
+    answer = CitedAnswer(
+        question="q",
+        answer_text="The provided documents do not contain enough information.",
+        citations=[],
+        abstained=False,
+    )
+    assert citation_coverage(answer) == 1.0
 
 
 def test_verify_offsets_matches_source() -> None:
