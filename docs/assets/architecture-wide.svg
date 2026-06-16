@@ -1,0 +1,167 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 990" width="1600" height="990" font-family="Inter, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="#888780" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+    <style>
+      .panel { fill:#FAFAF7; stroke:#D3D1C7; stroke-width:1.5; }
+      .plabel { font-size:18px; font-weight:600; fill:#5F5E5A; }
+      .bt { font-size:16px; font-weight:500; }
+      .bs { font-size:13px; font-weight:400; }
+      .arr { stroke:#888780; stroke-width:2; fill:none; }
+      .alabel { font-size:12px; font-weight:400; fill:#5F5E5A; }
+      .legtxt { font-size:13px; font-weight:400; fill:#5F5E5A; }
+      .kfig { font-size:28px; font-weight:700; }
+      .klbl { font-size:13px; font-weight:400; fill:#5F5E5A; }
+    </style>
+  </defs>
+
+  <rect width="1600" height="990" fill="white"/>
+
+  <text x="40" y="56" font-size="30" font-weight="700" fill="#26215C">Production RAG · FinanceBench</text>
+  <text x="40" y="86" font-size="15" font-weight="400" fill="#5F5E5A">Hybrid retrieval · contextual chunks · conformal abstention · grounded generation · triple eval</text>
+
+  <rect x="900" y="40" width="14" height="14" rx="3" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.2"/>
+  <text class="legtxt" x="920" y="51">Store / index</text>
+  <rect x="1040" y="40" width="14" height="14" rx="3" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.2"/>
+  <text class="legtxt" x="1060" y="51">Processing</text>
+  <rect x="1180" y="40" width="14" height="14" rx="3" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.2"/>
+  <text class="legtxt" x="1200" y="51">Decision gate</text>
+  <rect x="1340" y="40" width="14" height="14" rx="3" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.2"/>
+  <text class="legtxt" x="1360" y="51">Grounded answer</text>
+  <rect x="900" y="68" width="14" height="14" rx="3" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.2"/>
+  <text class="legtxt" x="920" y="79">Neutral / abstain</text>
+
+  <rect class="panel" x="40" y="140" width="440" height="680" rx="16"/>
+  <text class="plabel" x="62" y="172">① Offline · indexing (run once)</text>
+  <g>
+    <rect x="80" y="210" width="360" height="80" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+    <text class="bt" x="260" y="243" text-anchor="middle" fill="#26215C">FinanceBench</text>
+    <text class="bs" x="260" y="266" text-anchor="middle" fill="#3C3489">150 Q&amp;A · 10-K chunks</text>
+  </g>
+  <g>
+    <rect x="80" y="330" width="360" height="80" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="260" y="363" text-anchor="middle" fill="#04342C">Chunker</text>
+    <text class="bs" x="260" y="386" text-anchor="middle" fill="#0F6E56">512-token recursive</text>
+  </g>
+  <g>
+    <rect x="80" y="450" width="360" height="80" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="260" y="483" text-anchor="middle" fill="#04342C">Contextual prefix</text>
+    <text class="bs" x="260" y="506" text-anchor="middle" fill="#0F6E56">Claude Haiku per chunk</text>
+  </g>
+  <g>
+    <rect x="80" y="570" width="360" height="80" rx="10" fill="#EEEDFE" stroke="#534AB7" stroke-width="1.5"/>
+    <text class="bt" x="260" y="603" text-anchor="middle" fill="#26215C">Hybrid index</text>
+    <text class="bs" x="260" y="626" text-anchor="middle" fill="#3C3489">Qdrant + BM25</text>
+  </g>
+  <line class="arr" x1="260" y1="290" x2="260" y2="328" marker-end="url(#arrow)"/>
+  <line class="arr" x1="260" y1="410" x2="260" y2="448" marker-end="url(#arrow)"/>
+  <line class="arr" x1="260" y1="530" x2="260" y2="568" marker-end="url(#arrow)"/>
+
+  <line class="arr" x1="482" y1="430" x2="516" y2="430" marker-end="url(#arrow)"/>
+  <text class="alabel" x="499" y="421" text-anchor="middle">serves</text>
+
+  <rect class="panel" x="520" y="140" width="560" height="680" rx="16"/>
+  <text class="plabel" x="542" y="172">② Online · query → answer</text>
+  <g>
+    <rect x="710" y="200" width="180" height="52" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+    <text class="bt" x="800" y="226" text-anchor="middle" dominant-baseline="central" fill="#2C2C2A">Query</text>
+  </g>
+  <line class="arr" x1="800" y1="252" x2="800" y2="268"/>
+  <line class="arr" x1="800" y1="268" x2="686" y2="296" marker-end="url(#arrow)"/>
+  <line class="arr" x1="800" y1="268" x2="914" y2="296" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="560" y="298" width="230" height="60" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="675" y="320" text-anchor="middle" fill="#04342C">BM25 retrieve</text>
+    <text class="bs" x="675" y="341" text-anchor="middle" fill="#0F6E56">top-50 lexical</text>
+  </g>
+  <g>
+    <rect x="850" y="298" width="230" height="60" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="965" y="320" text-anchor="middle" fill="#04342C">Dense retrieve</text>
+    <text class="bs" x="965" y="341" text-anchor="middle" fill="#0F6E56">voyage-3-large · top-50</text>
+  </g>
+  <line class="arr" x1="675" y1="358" x2="778" y2="396" marker-end="url(#arrow)"/>
+  <line class="arr" x1="965" y1="358" x2="822" y2="396" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="710" y="398" width="180" height="54" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="800" y="418" text-anchor="middle" fill="#04342C">RRF fusion</text>
+    <text class="bs" x="800" y="438" text-anchor="middle" fill="#0F6E56">k = 60</text>
+  </g>
+  <line class="arr" x1="800" y1="452" x2="800" y2="476" marker-end="url(#arrow)"/>
+  <g>
+    <rect x="695" y="478" width="210" height="60" rx="10" fill="#E1F5EE" stroke="#0F6E56" stroke-width="1.5"/>
+    <text class="bt" x="800" y="500" text-anchor="middle" fill="#04342C">Cohere Rerank 3.5</text>
+    <text class="bs" x="800" y="521" text-anchor="middle" fill="#0F6E56">top-10 passages</text>
+  </g>
+  <line class="arr" x1="800" y1="538" x2="800" y2="554" marker-end="url(#arrow)"/>
+  <polygon points="800,556 854,610 800,664 746,610" fill="#FAEEDA" stroke="#854F0B" stroke-width="1.5"/>
+  <text class="bt" x="800" y="604" text-anchor="middle" fill="#412402">Conformal gate</text>
+  <text class="bs" x="800" y="624" text-anchor="middle" fill="#854F0B">τ · α = 0.10</text>
+  <line class="arr" x1="786" y1="650" x2="690" y2="682" marker-end="url(#arrow)"/>
+  <line class="arr" x1="814" y1="650" x2="910" y2="682" marker-end="url(#arrow)"/>
+  <text class="alabel" x="706" y="670" text-anchor="end">answer</text>
+  <text class="alabel" x="894" y="670" text-anchor="start">abstain</text>
+  <g>
+    <rect x="560" y="684" width="230" height="66" rx="10" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+    <text class="bt" x="675" y="711" text-anchor="middle" fill="#173404">Claude Sonnet 4.6</text>
+    <text class="bs" x="675" y="733" text-anchor="middle" fill="#3B6D11">Citations API · grounded</text>
+  </g>
+  <g>
+    <rect x="850" y="684" width="230" height="66" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+    <text class="bt" x="965" y="711" text-anchor="middle" fill="#2C2C2A">Abstain</text>
+    <text class="bs" x="965" y="733" text-anchor="middle" fill="#5F5E5A">insufficient confidence</text>
+  </g>
+
+  <line class="arr" x1="1082" y1="717" x2="1116" y2="717" marker-end="url(#arrow)"/>
+  <text class="alabel" x="1099" y="708" text-anchor="middle">scored</text>
+
+  <rect class="panel" x="1120" y="140" width="440" height="680" rx="16"/>
+  <text class="plabel" x="1142" y="172">③ Evaluation</text>
+  <g>
+    <rect x="1160" y="250" width="360" height="80" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+    <text class="bt" x="1340" y="283" text-anchor="middle" fill="#2C2C2A">RAGAS</text>
+    <text class="bs" x="1340" y="306" text-anchor="middle" fill="#5F5E5A">faithfulness</text>
+  </g>
+  <g>
+    <rect x="1160" y="350" width="360" height="80" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+    <text class="bt" x="1340" y="383" text-anchor="middle" fill="#2C2C2A">Vectara HHEM</text>
+    <text class="bs" x="1340" y="406" text-anchor="middle" fill="#5F5E5A">hallucination</text>
+  </g>
+  <g>
+    <rect x="1160" y="450" width="360" height="80" rx="10" fill="#F1EFE8" stroke="#5F5E5A" stroke-width="1.5"/>
+    <text class="bt" x="1340" y="483" text-anchor="middle" fill="#2C2C2A">DeepEval</text>
+    <text class="bs" x="1340" y="506" text-anchor="middle" fill="#5F5E5A">G-Eval financial</text>
+  </g>
+  <g>
+    <rect x="1160" y="550" width="360" height="80" rx="10" fill="#EAF3DE" stroke="#3B6D11" stroke-width="1.5"/>
+    <text class="bt" x="1340" y="583" text-anchor="middle" fill="#173404">Citation coverage</text>
+    <text class="bs" x="1340" y="606" text-anchor="middle" fill="#3B6D11">≥ 1 per answer</text>
+  </g>
+
+  <text x="40" y="868" font-size="14" font-weight="600" fill="#5F5E5A">Measured on FinanceBench test split (n=30) — reproduced from the harness, not hand-picked</text>
+  <g>
+    <rect x="40" y="884" width="288" height="84" rx="10" fill="#FAFAF7" stroke="#D3D1C7" stroke-width="1.5"/>
+    <text class="kfig" x="184" y="926" text-anchor="middle" fill="#854F0B">0.83</text>
+    <text class="klbl" x="184" y="952" text-anchor="middle">RAGAS faithfulness</text>
+  </g>
+  <g>
+    <rect x="348" y="884" width="288" height="84" rx="10" fill="#FAFAF7" stroke="#D3D1C7" stroke-width="1.5"/>
+    <text class="kfig" x="492" y="926" text-anchor="middle" fill="#3B6D11">1.00</text>
+    <text class="klbl" x="492" y="952" text-anchor="middle">citation coverage</text>
+  </g>
+  <g>
+    <rect x="656" y="884" width="288" height="84" rx="10" fill="#FAFAF7" stroke="#D3D1C7" stroke-width="1.5"/>
+    <text class="kfig" x="800" y="926" text-anchor="middle" fill="#0F6E56">7%</text>
+    <text class="klbl" x="800" y="952" text-anchor="middle">abstention rate</text>
+  </g>
+  <g>
+    <rect x="964" y="884" width="288" height="84" rx="10" fill="#FAFAF7" stroke="#D3D1C7" stroke-width="1.5"/>
+    <text class="kfig" x="1108" y="926" text-anchor="middle" fill="#3B6D11">$0.011</text>
+    <text class="klbl" x="1108" y="952" text-anchor="middle">cost per question</text>
+  </g>
+  <g>
+    <rect x="1272" y="884" width="288" height="84" rx="10" fill="#FAFAF7" stroke="#D3D1C7" stroke-width="1.5"/>
+    <text class="kfig" x="1416" y="926" text-anchor="middle" fill="#3B6D11">0.91</text>
+    <text class="klbl" x="1416" y="952" text-anchor="middle">dense recall@10</text>
+  </g>
+</svg>

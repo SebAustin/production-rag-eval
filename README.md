@@ -58,6 +58,9 @@ conformal abstention before Claude answers with citations; an **evaluation
 layer** scores each answered question with three independent judges plus a
 citation check.
 
+> A landscape version for slides and social is at
+> [`docs/assets/architecture-wide.png`](docs/assets/architecture-wide.png).
+
 <details>
 <summary>Same diagram as Mermaid (renders natively on GitHub)</summary>
 
