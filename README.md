@@ -19,20 +19,59 @@ passages. It is the closest public benchmark to real financial-services RAG work
 
 ## Architecture
 
+The system has three phases: an **offline indexing** pass that builds a hybrid
+index once, an **online query path** that retrieves, reranks, and gates every
+question through conformal abstention, and an **evaluation layer** that scores
+each answered question with three independent judges plus a citation check.
+
 ```mermaid
-flowchart LR
-    FB[FinanceBench<br/>150 Q&A + 10-K chunks] --> CH[Chunker<br/>512 tokens recursive]
-    CH --> CR[Contextual Retrieval<br/>Claude Haiku prefix per chunk]
-    CR --> IX[Index<br/>Qdrant dense voyage-3-large dim=256<br/>BM25 rank-bm25]
-    Q[Query] --> B[BM25 retrieve top-50]
-    Q --> D[Dense retrieve top-50]
-    B & D --> RRF[RRF fuse k=60]
-    RRF --> RR[Cohere Rerank 3.5 top-10]
-    RR --> CA[Conformal Abstention<br/>tau calibrated on 120 Qs alpha=0.10]
-    CA -->|answer| GEN[Claude Sonnet 4.6<br/>Citations API CitedAnswer]
-    CA -->|abstain| ABS[abstained: true<br/>insufficient_retrieval_confidence]
-    GEN --> EVAL[RAGAS faithfulness<br/>Vectara HHEM<br/>DeepEval G-Eval<br/>Citation coverage]
+flowchart TB
+    subgraph INDEX["① Offline · indexing (run once)"]
+        direction LR
+        FB[FinanceBench<br/>150 Q&A · 10-K chunks] --> CH[Chunker<br/>512-token recursive]
+        CH --> CR[Contextual prefix<br/>Claude Haiku per chunk]
+        CR --> IX[(Hybrid index<br/>Qdrant voyage-3-large dim=256<br/>+ BM25 rank-bm25)]
+    end
+
+    subgraph SERVE["② Online · query → answer"]
+        direction TB
+        Q([Query]) --> B[BM25 retrieve<br/>top-50 lexical]
+        Q --> D[Dense retrieve<br/>voyage-3-large top-50]
+        B & D --> RRF[RRF fusion<br/>k=60]
+        RRF --> RR[Cohere Rerank 3.5<br/>top-10 passages]
+        RR --> CA{Conformal gate<br/>τ calibrated · α=0.10}
+        CA -->|answer| GEN[Claude Sonnet 4.6<br/>Citations API · grounded]
+        CA -->|abstain| ABS[abstained: true<br/>insufficient confidence]
+    end
+
+    subgraph EVAL["③ Evaluation"]
+        direction LR
+        RG[RAGAS<br/>faithfulness]
+        HH[Vectara HHEM<br/>hallucination]
+        DE[DeepEval<br/>G-Eval financial]
+        CC[Citation coverage<br/>≥1 per answer]
+    end
+
+    IX -.serves.-> B
+    IX -.serves.-> D
+    GEN --> RG & HH & DE & CC
+
+    classDef store fill:#EEEDFE,stroke:#534AB7,color:#26215C;
+    classDef proc fill:#E1F5EE,stroke:#0F6E56,color:#04342C;
+    classDef gate fill:#FAEEDA,stroke:#854F0B,color:#412402;
+    classDef good fill:#EAF3DE,stroke:#3B6D11,color:#173404;
+    classDef neutral fill:#F1EFE8,stroke:#5F5E5A,color:#2C2C2A;
+    class FB,IX store;
+    class CH,CR,B,D,RRF,RR proc;
+    class CA gate;
+    class GEN,CC good;
+    class Q,ABS neutral;
+    class RG,HH,DE neutral;
 ```
+
+> Prefer a flat image? A rendered copy lives at
+> [`docs/assets/architecture.png`](docs/assets/architecture.png) (SVG:
+> [`architecture.svg`](docs/assets/architecture.svg)).
 
 ## Quickstart
 
